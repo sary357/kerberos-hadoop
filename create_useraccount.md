@@ -74,7 +74,7 @@ Valid starting       Expires              Service principal
 ```
 - set up owner&group
 ```
-# /opt/kerberos-hadoop/latest/bin/hdfs dfs chown ec2-user:ec2-user /user/ec2-user
+# /opt/kerberos-hadoop/latest/bin/hdfs dfs -chown ec2-user:ec2-user /user/ec2-user
 ```
 - verify
 ```
@@ -84,16 +84,15 @@ drwxr-xr-x   - ec2-user ec2-user            0 2022-06-27 14:33 /user/ec2-user
 ```
 
 ## try to upload a file
-- ensure HADOOP_HOME and HADOOP_CONF_DIR must be correct
-```
-$ export HADOOP_HOME=/opt/kerberos-hadoop/latest/
-$ export HADOOP_CONF_DIR=$HADOOP_HOME/etc/hadoop/
-```
 - login as `ec2-user`
 ```
 $ whoami
 ec2-user
-
+```
+- ensure HADOOP_HOME and HADOOP_CONF_DIR must be correct
+```
+$ export HADOOP_HOME=/opt/kerberos-hadoop/latest/
+$ export HADOOP_CONF_DIR=$HADOOP_HOME/etc/hadoop/
 ```
 - execute kinit
 ```
@@ -125,4 +124,65 @@ $ /opt/kerberos-hadoop/latest/bin/hdfs dfs -ls  /user/ec2-user
 Found 1 items
 -rw-r--r--   1 ec2-user ec2-user         61 2022-06-27 14:59 /user/ec2-user/README.txt
 
+```
+---
+## How can I genate a keytab for `ec2-user`?
+- use `kadmin` to write a file `ec2-user.keytab`
+```
+# kadmin
+Authenticating as principal root/admin@EC2.INTERNAL with password.
+Password for root/admin@EC2.INTERNAL: 
+
+kadmin:  listprincs
+HTTP/ip-172-17-1-212.ec2.internal@EC2.INTERNAL
+K/M@EC2.INTERNAL
+ec2-user/ip-172-17-1-212.ec2.internal@EC2.INTERNAL
+hdfs/ip-172-17-1-212.ec2.internal@EC2.INTERNAL
+kadmin/admin@EC2.INTERNAL
+kadmin/changepw@EC2.INTERNAL
+kadmin/ip-172-17-1-212.ec2.internal@EC2.INTERNAL
+kiprop/ip-172-17-1-212.ec2.internal@EC2.INTERNAL
+krbtgt/EC2.INTERNAL@EC2.INTERNAL
+root/admin@EC2.INTERNAL
+
+kadmin:  xst -k ec2-user.keytab ec2-user/ip-172-17-1-212.ec2.internal@EC2.INTERNAL
+Entry for principal ec2-user/ip-172-17-1-212.ec2.internal@EC2.INTERNAL with kvno 2, encryption type aes256-cts-hmac-sha1-96 added to keytab WRFILE:ec2-user.keytab.
+Entry for principal ec2-user/ip-172-17-1-212.ec2.internal@EC2.INTERNAL with kvno 2, encryption type aes128-cts-hmac-sha1-96 added to keytab WRFILE:ec2-user.keytab.
+Entry for principal ec2-user/ip-172-17-1-212.ec2.internal@EC2.INTERNAL with kvno 2, encryption type des3-cbc-sha1 added to keytab WRFILE:ec2-user.keytab.
+Entry for principal ec2-user/ip-172-17-1-212.ec2.internal@EC2.INTERNAL with kvno 2, encryption type arcfour-hmac added to keytab WRFILE:ec2-user.keytab.
+Entry for principal ec2-user/ip-172-17-1-212.ec2.internal@EC2.INTERNAL with kvno 2, encryption type camellia256-cts-cmac added to keytab WRFILE:ec2-user.keytab.
+Entry for principal ec2-user/ip-172-17-1-212.ec2.internal@EC2.INTERNAL with kvno 2, encryption type camellia128-cts-cmac added to keytab WRFILE:ec2-user.keytab.
+Entry for principal ec2-user/ip-172-17-1-212.ec2.internal@EC2.INTERNAL with kvno 2, encryption type des-hmac-sha1 added to keytab WRFILE:ec2-user.keytab.
+Entry for principal ec2-user/ip-172-17-1-212.ec2.internal@EC2.INTERNAL with kvno 2, encryption type des-cbc-md5 added to keytab WRFILE:ec2-user.keytab.
+
+```
+- copy this file to /home/ec2-user/ and change owner
+```
+# cp ec2-user.keytab /home/ec2-user/
+# chown ec2-user:ec2-user ec2-user.keytab 
+```
+- login as `ec2-user`
+```
+$ whoami
+ec2-user
+```
+- execute `kinit`
+```
+$ cd ~
+$ kinit -k -t ec2-user.keytab  hdfs/ip-172-17-1-212.ec2.internal@EC2.INTERNAL
+$ klist
+Ticket cache: FILE:/tmp/ec2-user_krb5cc
+Default principal: ec2-user/ip-172-17-1-212.ec2.internal@EC2.INTERNAL
+
+Valid starting       Expires              Service principal
+2022-06-27T15:10:08  2022-06-28T15:10:08  krbtgt/EC2.INTERNAL@EC2.INTERNAL
+	renew until 2022-07-04T15:10:08
+
+```
+- try to check files in the folder
+```
+$ /opt/kerberos-hadoop/latest/bin/hdfs dfs -ls /user/ec2-user
+Found 2 items
+-rw-r--r--   1 ec2-user ec2-user         61 2022-06-27 14:59 /user/ec2-user/README.txt
+-rw-r--r--   1 ec2-user ec2-user      12417 2022-06-27 14:33 /user/ec2-user/jce_policy-8.zip
 ```
