@@ -51,12 +51,7 @@ root/admin@EC2.INTERNAL
 ```
 
 ## create a home HDFS dir for ec2-user
-- ensure HADOOP_HOME and HADOOP_CONF_DIR must be correct
-```
-$ export HADOOP_HOME=/opt/kerberos-hadoop/latest/
-$ export HADOOP_CONF_DIR=$HADOOP_HOME/etc/hadoop/
-```
-- load hdfs keytab
+- load hdfs keytab. The following commands can be executed with any user account.
 
 ```
 # kinit -k -t /opt/kerberos-hadoop/keytabs/hdfs.keytab  hdfs/ip-172-17-1-212.ec2.internal@EC2.INTERNAL
@@ -89,6 +84,11 @@ drwxr-xr-x   - ec2-user ec2-user            0 2022-06-27 14:33 /user/ec2-user
 ```
 
 ## try to upload a file
+- ensure HADOOP_HOME and HADOOP_CONF_DIR must be correct
+```
+$ export HADOOP_HOME=/opt/kerberos-hadoop/latest/
+$ export HADOOP_CONF_DIR=$HADOOP_HOME/etc/hadoop/
+```
 - login as `ec2-user`
 ```
 $ whoami
