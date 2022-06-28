@@ -170,7 +170,7 @@ ec2-user
 - execute `kinit`
 ```
 $ cd ~
-$ kinit -k -t ec2-user.keytab  hdfs/ip-172-17-1-212.ec2.internal@EC2.INTERNAL
+$ kinit -k -t ec2-user.keytab  ec2-user/ip-172-17-1-212.ec2.internal@EC2.INTERNAL
 $ klist
 Ticket cache: FILE:/tmp/ec2-user_krb5cc
 Default principal: ec2-user/ip-172-17-1-212.ec2.internal@EC2.INTERNAL
