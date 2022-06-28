@@ -66,12 +66,41 @@ Jun 28 01:41:09 ip-172-17-1-212.ec2.internal systemd[1]: Started NTP client/serv
 Jun 28 01:41:15 ip-172-17-1-212.ec2.internal chronyd[8707]: Selected source 169.254.169.123
 
 ```
-## KDC package installation
+## create group: `hadoop` and user account: `hdfs`, `mapred`, `hadoop`, `yarn`, `HTTP`
+```
+[root@ip-172-17-1-212 ~]# groupadd hadoop
+[root@ip-172-17-1-212 ~]# useradd hadoop -g hadoop
+[root@ip-172-17-1-212 ~]#  useradd hdfs -g hadoop
+[root@ip-172-17-1-212 ~]#  useradd mapred -g hadoop
+[root@ip-172-17-1-212 ~]#  useradd yarn -g hadoop
+[root@ip-172-17-1-212 ~]#  useradd yarn -g hadoop
+[root@ip-172-17-1-212 ~]#  useradd HTTP -g hadoop
+```
+## set up environment in `~/.bash_profile` of `root`
+```
+[root@ip-172-17-1-212 ~]# cat ~/.bash_profile 
+# .bash_profile
+
+# Get the aliases and functions
+if [ -f ~/.bashrc ]; then
+	. ~/.bashrc
+fi
+
+# User specific environment and startup programs
+
+PATH=$PATH:$HOME/bin
+alias python=python3.7
+export PYSPARK_PYTHON=python3.7
+export PYSPARK_DRIVER_PYTHON=python3.7
+export KRB5CCNAME=/tmp/$USER\_krb5cc
+export PATH
+```
+# KDC package installation
 - Package installation
 ```
 [root@ip-172-17-1-212 ~]# yum install -y krb5-server krb5-libs krb5-auth-dialog krb5-workstation
 ```
-## KDC configuration
+# KDC configuration
 - modify `/etc/krb5.conf`
 ```
 [root@ip-172-17-1-212 ~]# vim /etc/krb5.conf
@@ -142,6 +171,127 @@ includedir /etc/krb5.conf.d/
 - create database
 ```
 [root@ip-172-17-1-212 ~]# kdb5_util create -r EC2.INTERNAL -s
+Loading random data
+Initializing database '/var/kerberos/krb5kdc/principal' for realm 'BOOK.VBIRD',
+master key name 'K/M@BOOK.VBIRD'
+You will be prompted for the database Master Password.
+It is important that you NOT FORGET this password.
+Enter KDC database master key:  <------------------------ Enter password
+Re-enter KDC database master key to verify:  <----------- Enter password
 ```
+- verify
+```
+[root@ip-172-17-1-212 ~]# ls -l  /var/kerberos/krb5kdc/ 
+total 56
+-rw------- 1 root root    23 Jun 26 14:22 kadm5.acl
+-rw------- 1 root root    23 Jun 20 14:44 kadm5.acl.rpmsave
+-rw------- 1 root root   549 Jun 28 01:58 kdc.conf
+-rw------- 1 root root   604 Jun 26 14:11 kdc.conf.rpmsave
+-rw------- 1 root root 20480 Jun 27 15:08 principal
+-rw------- 1 root root  8192 Jun 26 14:23 principal.kadm5
+-rw------- 1 root root     0 Jun 26 14:23 principal.kadm5.lock
+-rw------- 1 root root     0 Jun 27 15:08 principal.ok
+```
+- start services: `krb5kdc` and `kadmin`
+```
+[root@ip-172-17-1-212 ~]# systemctl enable krb5kdc
+[root@ip-172-17-1-212 ~]# systemctl start krb5kdc
+[root@ip-172-17-1-212 ~]# systemctl status krb5kdc
+● krb5kdc.service - Kerberos 5 KDC
+   Loaded: loaded (/usr/lib/systemd/system/krb5kdc.service; enabled; vendor preset: disabled)
+   Active: active (running) since Sun 2022-06-26 14:24:24 UTC; 1 day 23h ago
+ Main PID: 17890 (krb5kdc)
+   CGroup: /system.slice/krb5kdc.service
+           └─17890 /usr/sbin/krb5kdc -P /var/run/krb5kdc.pid
+
+Jun 26 14:24:24 ip-172-17-1-212.ec2.internal systemd[1]: Starting Kerberos 5 KDC...
+Jun 26 14:24:24 ip-172-17-1-212.ec2.internal systemd[1]: Started Kerberos 5 KDC.
+
+[root@ip-172-17-1-212 ~]# systemctl enable kadmin
+[root@ip-172-17-1-212 ~]# systemctl start kadmin
+[root@ip-172-17-1-212 ~]# systemctl status kadmin
+● kadmin.service - Kerberos 5 Password-changing and Administration
+   Loaded: loaded (/usr/lib/systemd/system/kadmin.service; enabled; vendor preset: disabled)
+   Active: active (running) since Sun 2022-06-26 14:27:19 UTC; 1 day 23h ago
+ Main PID: 19012 (kadmind)
+   CGroup: /system.slice/kadmin.service
+           └─19012 /usr/sbin/kadmind -P /var/run/kadmind.pid
+
+Jun 26 14:27:18 ip-172-17-1-212.ec2.internal systemd[1]: Starting Kerberos 5 Password-changing and Administration...
+Jun 26 14:27:19 ip-172-17-1-212.ec2.internal systemd[1]: Started Kerberos 5 Password-changing and Administration.
+
+```
+- create kerberos admin account - root/admin@EC2.INTERNAL
+```
+[root@ip-172-17-1-212 ~]# kadmin
+Authenticating as principal root/admin@EC2.INTERNAL with password.
+Password for K/M@EC2.INTERNAL: 
+kadmin:  listprincs
+K/M@EC2.INTERNAL
+kadmin/admin@EC2.INTERNAL
+kadmin/changepw@EC2.INTERNAL
+kadmin/ip-172-17-1-212.ec2.internal@EC2.INTERNAL
+kiprop/ip-172-17-1-212.ec2.internal@EC2.INTERNAL
+krbtgt/EC2.INTERNAL@EC2.INTERNAL
+
+kadmin: addprinc root/admin 
+WARNING: no policy specified for root/admin@EC2.INTERNAL; defaulting to no policy
+Enter password for principal "root/admin@EC2.INTERNAL":  -------------> input password
+Re-enter password for principal "root/admin@EC2.INTERNAL":  ----------> input password
+Principal "root/admin@EC2.INTERNAL" created.
+
+```
+- verify with `kadmin`
+```
+kadmin:  listprincs
+HTTP/ip-172-17-1-212.ec2.internal@EC2.INTERNAL
+K/M@EC2.INTERNAL
+kadmin/admin@EC2.INTERNAL
+kadmin/changepw@EC2.INTERNAL
+kadmin/ip-172-17-1-212.ec2.internal@EC2.INTERNAL
+kiprop/ip-172-17-1-212.ec2.internal@EC2.INTERNAL
+krbtgt/EC2.INTERNAL@EC2.INTERNAL
+root/admin@EC2.INTERNAL ---------------------------> if you see this, that should be no problem
+```
+- verify with `kinit`
+```
+[root@ip-172-17-1-212 ~]# kinit root/admin
+Password for root/admin@EC2.INTERNAL: 
+[root@ip-172-17-1-212 ~]# klist
+Ticket cache: FILE:/tmp/root_krb5cc
+Default principal: root/admin@EC2.INTERNAL
+
+Valid starting       Expires              Service principal
+06/28/2022 14:09:27  06/29/2022 14:09:27  krbtgt/EC2.INTERNAL@EC2.INTERNAL
+	renew until 07/05/2022 14:09:27
+```
+- export and save admin keytab
+```
+[root@ip-172-17-1-212 krb5kdc]# kadmin.local -q "ktadd kadmin/admin"
+Authenticating as principal root/admin@EC2.INTERNAL with password.
+Entry for principal kadmin/admin with kvno 2, encryption type aes256-cts-hmac-sha1-96 added to keytab FILE:/etc/krb5.keytab.
+Entry for principal kadmin/admin with kvno 2, encryption type aes128-cts-hmac-sha1-96 added to keytab FILE:/etc/krb5.keytab.
+Entry for principal kadmin/admin with kvno 2, encryption type des3-cbc-sha1 added to keytab FILE:/etc/krb5.keytab.
+Entry for principal kadmin/admin with kvno 2, encryption type arcfour-hmac added to keytab FILE:/etc/krb5.keytab.
+Entry for principal kadmin/admin with kvno 2, encryption type camellia256-cts-cmac added to keytab FILE:/etc/krb5.keytab.
+Entry for principal kadmin/admin with kvno 2, encryption type camellia128-cts-cmac added to keytab FILE:/etc/krb5.keytab.
+Entry for principal kadmin/admin with kvno 2, encryption type des-hmac-sha1 added to keytab FILE:/etc/krb5.keytab.
+Entry for principal kadmin/admin with kvno 2, encryption type des-cbc-md5 added to keytab FILE:/etc/krb5.keytab.
+
+[root@ip-172-17-1-212 krb5kdc]# klist -k /etc/krb5.keytab 
+Keytab name: FILE:/etc/krb5.keytab
+KVNO Principal
+---- --------------------------------------------------------------------------
+   2 kadmin/admin@EC2.INTERNAL
+   2 kadmin/admin@EC2.INTERNAL
+   2 kadmin/admin@EC2.INTERNAL
+   2 kadmin/admin@EC2.INTERNAL
+   2 kadmin/admin@EC2.INTERNAL
+   2 kadmin/admin@EC2.INTERNAL
+   2 kadmin/admin@EC2.INTERNAL
+   2 kadmin/admin@EC2.INTERNAL
+
+```
+
 ## References
 - [鳥哥的私房菜](https://linux.vbird.org/events/kerberos.php)
