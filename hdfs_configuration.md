@@ -308,3 +308,9 @@ hdfs
 [root@ip-172-17-1-212 unix]# cd /opt/kerberos-hadoop/hadoop-3.3.3/sbin/
 [root@ip-172-17-1-212 sbin]# ./start-secure-dns.sh
 ```
+
+# References
+- https://codertw.com/%E7%A8%8B%E5%BC%8F%E8%AA%9E%E8%A8%80/406868/
+- https://ravi-chamarthy.medium.com/apache-hadoop-multi-node-kerberized-cluster-setup-9b6508c71794
+- https://ravi-chamarthy.medium.com/kerberos-setup-for-apache-hadoop-multi-node-cluster-6bd8a2fbe680
+- https://ravi-chamarthy.medium.com/hadoop-hdfs-and-yarn-kerberos-based-configuration-d23d286fdbcc
