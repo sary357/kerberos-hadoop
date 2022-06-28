@@ -50,7 +50,7 @@ root/admin@EC2.INTERNAL
 
 ```
 
-## create a home HDFS dir for ec2-user
+## create a home HDFS dir for `ec2-user`
 - load hdfs keytab. The following commands can be executed with any user account.
 
 ```
@@ -89,10 +89,11 @@ drwxr-xr-x   - ec2-user ec2-user            0 2022-06-27 14:33 /user/ec2-user
 $ whoami
 ec2-user
 ```
-- ensure HADOOP_HOME and HADOOP_CONF_DIR must be correct
+- ensure KRB5CCNAME, HADOOP_HOME and HADOOP_CONF_DIR must be correct
 ```
 $ export HADOOP_HOME=/opt/kerberos-hadoop/latest/
 $ export HADOOP_CONF_DIR=$HADOOP_HOME/etc/hadoop/
+$ export KRB5CCNAME=/tmp/ec2-user_krb5cc
 ```
 - execute kinit
 ```
