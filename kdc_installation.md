@@ -223,9 +223,7 @@ Jun 26 14:27:19 ip-172-17-1-212.ec2.internal systemd[1]: Started Kerberos 5 Pass
 ```
 - create kerberos admin account - root/admin@EC2.INTERNAL
 ```
-[root@ip-172-17-1-212 ~]# kadmin
-Authenticating as principal root/admin@EC2.INTERNAL with password.
-Password for K/M@EC2.INTERNAL: 
+[root@ip-172-17-1-212 ~]# kadmin.local
 kadmin:  listprincs
 K/M@EC2.INTERNAL
 kadmin/admin@EC2.INTERNAL
