@@ -20,6 +20,7 @@ ip-172-17-1-212.ec2.internal
 ## Time(時間)
 - We must ensure time every host controlled by KDC must be in sync
 - On linux, we use `chrony`.
+### On `172.17.1.212` 
 - Let's modify `/etc/chrony.conf`
 ```
 [root@ip-172-17-1-212 ~]# vim /etc/chrony.conf 
@@ -64,14 +65,14 @@ Jun 28 01:41:09 ip-172-17-1-212.ec2.internal systemd[1]: Started NTP client/serv
 Jun 28 01:41:15 ip-172-17-1-212.ec2.internal chronyd[8707]: Selected source 169.254.169.123
 
 ```
-- set up other hosts: ntp. On each host, /etc/chronyd should look like
+### On hosts: `172.17.2.110`, `172.17.2.130`, and `172.17.2.96`
+- On each host, /etc/chronyd should look like
 ```
-server 169.254.169.123 prefer iburst minpoll 4 maxpoll 4
-
-pool 172.17.1.212 iburst maxsources 1
+server  172.17.1.212 iburst
 pool 0.amazon.pool.ntp.org iburst maxsources 1
 pool 1.amazon.pool.ntp.org iburst maxsources 1
 pool 2.amazon.pool.ntp.org iburst maxsources 2
+
 driftfile /var/lib/chrony/drift
 makestep 1.0 3
 rtcsync
@@ -81,25 +82,26 @@ dumponexit
 dumpdir /var/run/chrony
 sourcedir /run/chrony-dhcp
 ```
-- set up other hosts: enable chronyd. On each host, enable/start chronyd
+- On each host, enable/start chronyd
 ```
 # systemctl start chronyd
 # systemctl enable chronyd
 # systemctl status chronyd
 ● chronyd.service - NTP client/server
    Loaded: loaded (/usr/lib/systemd/system/chronyd.service; enabled; vendor preset: enabled)
-   Active: active (running) since 三 2022-06-29 02:17:31 UTC; 46min ago
+   Active: active (running) since 三 2022-06-29 14:06:02 UTC; 7s ago
      Docs: man:chronyd(8)
            man:chrony.conf(5)
- Main PID: 1804 (chronyd)
+  Process: 2722 ExecStart=/usr/sbin/chronyd $OPTIONS (code=exited, status=0/SUCCESS)
+ Main PID: 2724 (chronyd)
    CGroup: /system.slice/chronyd.service
-           └─1804 /usr/sbin/chronyd
+           └─2724 /usr/sbin/chronyd
 
- 6月 29 02:17:31 localhost systemd[1]: Starting NTP client/server...
- 6月 29 02:17:31 localhost chronyd[1804]: chronyd version 4.0 starting (+CMDMON +NTP +REFCLOCK +RTC +PRIVDROP +SCFILTER +SIGND +ASYNCDNS -NTS +SECHASH +IPV6 +DEBUG)
- 6月 29 02:17:31 localhost systemd[1]: Started NTP client/server.
- 6月 29 02:17:37 ip-172-17-2-96.ec2.internal chronyd[1804]: Selected source 169.254.169.123
-
+ 6月 29 14:06:02 ip-172-17-2-96.ec2.internal systemd[1]: Starting NTP client/server...
+ 6月 29 14:06:02 ip-172-17-2-96.ec2.internal chronyd[2724]: chronyd version 4.0 starting (+CMDMON +NTP +REFCLOCK +RTC +PRIVDROP +SCFILTER +SIGND +ASYNCDNS -NTS +SECHASH +IPV6 +DEBUG)
+ 6月 29 14:06:02 ip-172-17-2-96.ec2.internal chronyd[2724]: Frequency -8.565 +/- 0.087 ppm read from /var/lib/chrony/drift
+ 6月 29 14:06:02 ip-172-17-2-96.ec2.internal systemd[1]: Started NTP client/server.
+ 6月 29 14:06:08 ip-172-17-2-96.ec2.internal chronyd[2724]: Selected source 172.17.1.212
 ```
 ## create group: `hadoop` and user account: `hdfs`, `mapred`, `hadoop`, `yarn`, `HTTP`
 ```
