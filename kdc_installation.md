@@ -119,7 +119,7 @@ sourcedir /run/chrony-dhcp
 
 # KDC installation&configuration
 ## Environment variables on `172.17.1.212`.
-- set up environment in `~/.bash_profile` of `root`
+- set up environment in `/root/.bash_profile`
 ```
 [root@ip-172-17-1-212 ~]# cat ~/.bash_profile
 # .bash_profile
@@ -335,27 +335,6 @@ KVNO Principal
    2 kadmin/admin@EC2.INTERNAL
    2 kadmin/admin@EC2.INTERNAL
 
-```
-
-# TBD
-## set up environment in `~/.bash_profile` of `root`
-```
-[root@ip-172-17-1-212 ~]# cat ~/.bash_profile
-# .bash_profile
-
-# Get the aliases and functions
-if [ -f ~/.bashrc ]; then
-        . ~/.bashrc
-fi
-
-# User specific environment and startup programs
-
-PATH=$PATH:$HOME/bin
-alias python=python3.7
-export PYSPARK_PYTHON=python3.7
-export PYSPARK_DRIVER_PYTHON=python3.7
-export KRB5CCNAME=/tmp/$USER\_krb5cc
-export PATH
 ```
 
 ## References
