@@ -144,7 +144,7 @@ export PATH
 ```
 [root@ip-172-17-1-212 ~]# yum install -y krb5-server krb5-libs krb5-workstation
 ```
-## KDC configuration
+## KDC configuration on `172.17.1.212`.
 - modify `/etc/krb5.conf`
 ```
 [root@ip-172-17-1-212 ~]# vim /etc/krb5.conf
@@ -336,6 +336,18 @@ KVNO Principal
    2 kadmin/admin@EC2.INTERNAL
 
 ```
+## Other host configuration
+- On `172.17.2.110`, `172.17.2.130`, and `172.17.2.96`, we need to install packages
+- Please execute the following commands on each host
+```
+[root@ip-172-17-2-96 ~]#  yum install -y krb5-workstation
+```
+- Copy /etc/krb5.conf from 172.17.1.212 to each host. On each host, we need to execute
+```
+[root@ip-172-17-2-96 ~]# scp 172.17.1.212:/etc/krb5.conf  /etc/
+```
+
+## That's all for KDC configuration&installation
 - Congrat!! We finish KDC installation and configuration!!
 
 # References
