@@ -1,7 +1,3 @@
-# Background information
-- Our `REALM` is `EC2.INTERNAL`
-- We install KDC on a host `ip-172-17-1-212.ec2.internal` and its IP is `172.17.1.212`.
-
 # Ensure hostname and time
 ## Hostname(主機名)
 - You can use 1) `/etc/hosts` or 2) DNS to define hostname. Here, we use `/etc/hosts`
@@ -10,13 +6,15 @@
 [root@ip-172-17-1-212 ~]# hostname
 ip-172-17-1-212.ec2.internal
 ```
-- update `/etc/hosts`: add `172.17.1.212 ip-172-17-1-212.ec2.internal` 
+- update `/etc/hosts`
 ```
-[root@ip-172-17-1-212 ~]# cat /etc/hosts
+[root@ip-172-17-2-110 ~]# cat /etc/hosts
 127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
 ::1         localhost6 localhost6.localdomain6
-127.0.0.1	host.minikube.internal
 172.17.1.212	ip-172-17-1-212.ec2.internal
+172.17.2.110    ip-172-17-2-110.ec2.internal
+172.17.2.130    ip-172-17-2-130.ec2.internal
+172.17.2.96     ip-172-17-2-96.ec2.internal
 
 ```
 ## Time(時間)
@@ -64,6 +62,54 @@ Jun 28 01:41:09 ip-172-17-1-212.ec2.internal chronyd[8707]: chronyd version 4.0 
 Jun 28 01:41:09 ip-172-17-1-212.ec2.internal chronyd[8707]: Frequency -28.099 +/- 0.024 ppm read from /var/lib/chrony/drift
 Jun 28 01:41:09 ip-172-17-1-212.ec2.internal systemd[1]: Started NTP client/server.
 Jun 28 01:41:15 ip-172-17-1-212.ec2.internal chronyd[8707]: Selected source 169.254.169.123
+
+```
+- set up other hosts:  /etc/hosts. be sure /etc/hosts on each host should look like
+```
+[ec2-user@ip-172-17-1-212 hadoop-prep]$ cat /etc/hosts
+127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
+::1         localhost6 localhost6.localdomain6
+172.17.1.212	ip-172-17-1-212.ec2.internal
+172.17.2.110    ip-172-17-2-110.ec2.internal
+172.17.2.130    ip-172-17-2-130.ec2.internal
+172.17.2.96     ip-172-17-2-96.ec2.internal
+
+```
+- set up other hosts: ntp. On each host, /etc/chronyd should look like
+```
+server 169.254.169.123 prefer iburst minpoll 4 maxpoll 4
+
+pool 172.17.1.212 iburst maxsources 1
+pool 0.amazon.pool.ntp.org iburst maxsources 1
+pool 1.amazon.pool.ntp.org iburst maxsources 1
+pool 2.amazon.pool.ntp.org iburst maxsources 2
+driftfile /var/lib/chrony/drift
+makestep 1.0 3
+rtcsync
+keyfile /etc/chrony.keys
+logdir /var/log/chrony
+dumponexit
+dumpdir /var/run/chrony
+sourcedir /run/chrony-dhcp
+```
+- set up other hosts: enable chronyd. On each host, enable/start chronyd
+```
+# systemctl start chronyd
+# systemctl enable chronyd
+# systemctl status chronyd
+● chronyd.service - NTP client/server
+   Loaded: loaded (/usr/lib/systemd/system/chronyd.service; enabled; vendor preset: enabled)
+   Active: active (running) since 三 2022-06-29 02:17:31 UTC; 46min ago
+     Docs: man:chronyd(8)
+           man:chrony.conf(5)
+ Main PID: 1804 (chronyd)
+   CGroup: /system.slice/chronyd.service
+           └─1804 /usr/sbin/chronyd
+
+ 6月 29 02:17:31 localhost systemd[1]: Starting NTP client/server...
+ 6月 29 02:17:31 localhost chronyd[1804]: chronyd version 4.0 starting (+CMDMON +NTP +REFCLOCK +RTC +PRIVDROP +SCFILTER +SIGND +ASYNCDNS -NTS +SECHASH +IPV6 +DEBUG)
+ 6月 29 02:17:31 localhost systemd[1]: Started NTP client/server.
+ 6月 29 02:17:37 ip-172-17-2-96.ec2.internal chronyd[1804]: Selected source 169.254.169.123
 
 ```
 ## create group: `hadoop` and user account: `hdfs`, `mapred`, `hadoop`, `yarn`, `HTTP`
