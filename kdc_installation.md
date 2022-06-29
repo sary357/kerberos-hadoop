@@ -1,12 +1,12 @@
 # Ensure hostname and time
 ## Hostname(主機名)
 - You can use 1) `/etc/hosts` or 2) DNS to define hostname. Here, we use `/etc/hosts`
-- use `hostname` to get name of this host
+- use `hostname` to get name of EVERY host
 ```
 [root@ip-172-17-1-212 ~]# hostname
 ip-172-17-1-212.ec2.internal
 ```
-- update `/etc/hosts`
+- update `/etc/hosts` on EVERY host.
 ```
 [root@ip-172-17-2-110 ~]# cat /etc/hosts
 127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
@@ -62,17 +62,6 @@ Jun 28 01:41:09 ip-172-17-1-212.ec2.internal chronyd[8707]: chronyd version 4.0 
 Jun 28 01:41:09 ip-172-17-1-212.ec2.internal chronyd[8707]: Frequency -28.099 +/- 0.024 ppm read from /var/lib/chrony/drift
 Jun 28 01:41:09 ip-172-17-1-212.ec2.internal systemd[1]: Started NTP client/server.
 Jun 28 01:41:15 ip-172-17-1-212.ec2.internal chronyd[8707]: Selected source 169.254.169.123
-
-```
-- set up other hosts:  /etc/hosts. be sure /etc/hosts on each host should look like
-```
-[ec2-user@ip-172-17-1-212 hadoop-prep]$ cat /etc/hosts
-127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
-::1         localhost6 localhost6.localdomain6
-172.17.1.212	ip-172-17-1-212.ec2.internal
-172.17.2.110    ip-172-17-2-110.ec2.internal
-172.17.2.130    ip-172-17-2-130.ec2.internal
-172.17.2.96     ip-172-17-2-96.ec2.internal
 
 ```
 - set up other hosts: ntp. On each host, /etc/chronyd should look like
