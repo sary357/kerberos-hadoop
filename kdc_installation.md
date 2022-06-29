@@ -336,6 +336,8 @@ KVNO Principal
    2 kadmin/admin@EC2.INTERNAL
 
 ```
+- Congrat!! We finish KDC installation and configuration!!
 
-## References
+# References
 - [鳥哥的私房菜](https://linux.vbird.org/events/kerberos.php)
+- [HDFS 配置 Kerberos](https://codertw.com/%E7%A8%8B%E5%BC%8F%E8%AA%9E%E8%A8%80/406868/)
