@@ -103,24 +103,30 @@ sourcedir /run/chrony-dhcp
  6月 29 14:06:02 ip-172-17-2-96.ec2.internal systemd[1]: Started NTP client/server.
  6月 29 14:06:08 ip-172-17-2-96.ec2.internal chronyd[2724]: Selected source 172.17.1.212
 ```
-## create group: `hadoop` and user account: `hdfs`, `mapred`, `hadoop`, `yarn`, `HTTP`
+## create user account: `hdfs`, `mapred`, `hadoop`, `yarn`, `HTTP` on `172.17.2.110`, `172.17.2.130`, and `172.17.2.96`
+- On 172.17.2.110 172.17.2.130 172.17.2.96, please create user account with the following commands.
 ```
-[root@ip-172-17-1-212 ~]# groupadd hadoop
-[root@ip-172-17-1-212 ~]# useradd hadoop -g hadoop
-[root@ip-172-17-1-212 ~]#  useradd hdfs -g hadoop
-[root@ip-172-17-1-212 ~]#  useradd mapred -g hadoop
-[root@ip-172-17-1-212 ~]#  useradd yarn -g hadoop
-[root@ip-172-17-1-212 ~]#  useradd yarn -g hadoop
-[root@ip-172-17-1-212 ~]#  useradd HTTP -g hadoop
+[root@ip-172-17-2-110 ~]#  groupadd -g 1001 hadoop
+[root@ip-172-17-2-110 ~]#  useradd -u 1001  hadoop -g hadoop
+[root@ip-172-17-2-110 ~]#  useradd -u 1002  hdfs   -g hadoop
+[root@ip-172-17-2-110 ~]#  useradd -u 1003  mapred -g hadoop
+[root@ip-172-17-2-110 ~]#  useradd -u 1004  yarn -g hadoop
+[root@ip-172-17-2-110 ~]#  useradd -u 1005  hive -g hadoop
+[root@ip-172-17-2-110 ~]#  useradd -u 1006  spark -g hadoop
+[root@ip-172-17-2-110 ~]#  useradd -u 1007  HTTP -g hadoop
 ```
-## set up environment in `~/.bash_profile` of `root`
+---
+
+# KDC installation&configuration
+## Environment variables on `172.17.1.212`.
+- set up environment in `~/.bash_profile` of `root`
 ```
-[root@ip-172-17-1-212 ~]# cat ~/.bash_profile 
+[root@ip-172-17-1-212 ~]# cat ~/.bash_profile
 # .bash_profile
 
 # Get the aliases and functions
 if [ -f ~/.bashrc ]; then
-	. ~/.bashrc
+        . ~/.bashrc
 fi
 
 # User specific environment and startup programs
@@ -132,12 +138,13 @@ export PYSPARK_DRIVER_PYTHON=python3.7
 export KRB5CCNAME=/tmp/$USER\_krb5cc
 export PATH
 ```
-# KDC package installation
-- Package installation
+
+## Package installation
+- Package installation on `172.17.1.212`
 ```
-[root@ip-172-17-1-212 ~]# yum install -y krb5-server krb5-libs krb5-auth-dialog krb5-workstation
+[root@ip-172-17-1-212 ~]# yum install -y krb5-server krb5-libs krb5-workstation
 ```
-# KDC configuration
+## KDC configuration
 - modify `/etc/krb5.conf`
 ```
 [root@ip-172-17-1-212 ~]# vim /etc/krb5.conf
@@ -248,7 +255,7 @@ Jun 26 14:24:24 ip-172-17-1-212.ec2.internal systemd[1]: Started Kerberos 5 KDC.
 [root@ip-172-17-1-212 ~]# systemctl start kadmin
 [root@ip-172-17-1-212 ~]# systemctl status kadmin
 ● kadmin.service - Kerberos 5 Password-changing and Administration
-   Loaded: loaded (/usr/lib/systemd/system/kadmin.service; enabled; vendor preset: disabled)
+systemctl status krb5kdc   Loaded: loaded (/usr/lib/systemd/system/kadmin.service; enabled; vendor preset: disabled)
    Active: active (running) since Sun 2022-06-26 14:27:19 UTC; 1 day 23h ago
  Main PID: 19012 (kadmind)
    CGroup: /system.slice/kadmin.service
@@ -276,9 +283,11 @@ Re-enter password for principal "root/admin@EC2.INTERNAL":  ----------> input pa
 Principal "root/admin@EC2.INTERNAL" created.
 
 ```
-- verify with `kadmin`
+- verify with `kadmin.local`
 ```
-kadmin:  listprincs
+[root@ip-172-17-1-212 ~]# kadmin.local
+Authenticating as principal root/admin@EC2.INTERNAL with password.
+kadmin.local:  listprincs
 HTTP/ip-172-17-1-212.ec2.internal@EC2.INTERNAL
 K/M@EC2.INTERNAL
 kadmin/admin@EC2.INTERNAL
@@ -326,6 +335,27 @@ KVNO Principal
    2 kadmin/admin@EC2.INTERNAL
    2 kadmin/admin@EC2.INTERNAL
 
+```
+
+# TBD
+## set up environment in `~/.bash_profile` of `root`
+```
+[root@ip-172-17-1-212 ~]# cat ~/.bash_profile
+# .bash_profile
+
+# Get the aliases and functions
+if [ -f ~/.bashrc ]; then
+        . ~/.bashrc
+fi
+
+# User specific environment and startup programs
+
+PATH=$PATH:$HOME/bin
+alias python=python3.7
+export PYSPARK_PYTHON=python3.7
+export PYSPARK_DRIVER_PYTHON=python3.7
+export KRB5CCNAME=/tmp/$USER\_krb5cc
+export PATH
 ```
 
 ## References
