@@ -1,64 +1,89 @@
 # HDFS configuraton
-## Principal generation
-- generate principals for `hdfs` and `HTTP`
+## Principal generation on `172.17.1.212`
+- generate principals for `hdfs` and `HTTP` on EACH host(172.17.2.110, 172.17.2.130, and 172.17.2.96).  You can use commands like
 ```
-[root@ip-172-17-1-212 ~]# kadmin 
-Authenticating as principal root/admin@EC2.INTERNAL with password.
-Password for root/admin@EC2.INTERNAL: 
-kadmin: addprinc -randkey hdfs/ip-172-17-1-212.ec2.internal@EC2.INTERNAL
-kadmin: addprinc -randkey HTTP/ip-172-17-1-212.ec2.internal@EC2.INTERNAL
-kadmin:  listprincs
-HTTP/ip-172-17-1-212.ec2.internal@EC2.INTERNAL
-K/M@EC2.INTERNAL
-hdfs/ip-172-17-1-212.ec2.internal@EC2.INTERNAL
-kadmin/admin@EC2.INTERNAL
-kadmin/changepw@EC2.INTERNAL
-kadmin/ip-172-17-1-212.ec2.internal@EC2.INTERNAL
-kiprop/ip-172-17-1-212.ec2.internal@EC2.INTERNAL
-krbtgt/EC2.INTERNAL@EC2.INTERNAL
-root/admin@EC2.INTERNAL
-
-```
-- You can use commands like
-```
-# kadmin.local -q "addprinc -randkey hdfs/ip-172-17-1-212.ec2.internal@EC2.INTERNAL"
-# kadmin.local -q "addprinc -randkey HTTP/ip-172-17-1-212.ec2.internal@EC2.INTERNAL"
+# kadmin.local -q "addprinc -randkey hdfs/ip-172-17-2-110.ec2.internal@EC2.INTERNAL"
+# kadmin.local -q "addprinc -randkey hdfs/ip-172-17-2-130.ec2.internal@EC2.INTERNAL"
+# kadmin.local -q "addprinc -randkey hdfs/ip-172-17-2-96.ec2.internal@EC2.INTERNAL"
+# kadmin.local -q "addprinc -randkey HTTP/ip-172-17-2-110.ec2.internal@EC2.INTERNAL"
+# kadmin.local -q "addprinc -randkey HTTP/ip-172-17-2-130.ec2.internal@EC2.INTERNAL"
+# kadmin.local -q "addprinc -randkey HTTP/ip-172-17-2-96.ec2.internal@EC2.INTERNAL"
+# kadmin.local -q "listprincs"
 ```
 ## keytab file generation
-- execute the following commands
+- execute the following commands to generate hdfs-unmerged.keytab
 ```
-root@ip-172-17-1-212 tmp]# kadmin.local -q "xst -k hdfs-unmerged.keytab hdfs/ip-172-17-1-212.ec2.internal@EC2.INTERNAL"
-Authenticating as principal root/admin@EC2.INTERNAL with password.
-Entry for principal hdfs/ip-172-17-1-212.ec2.internal@EC2.INTERNAL with kvno 3, encryption type aes256-cts-hmac-sha1-96 added to keytab WRFILE:hdfs-unmerged.keytab.
-Entry for principal hdfs/ip-172-17-1-212.ec2.internal@EC2.INTERNAL with kvno 3, encryption type aes128-cts-hmac-sha1-96 added to keytab WRFILE:hdfs-unmerged.keytab.
-Entry for principal hdfs/ip-172-17-1-212.ec2.internal@EC2.INTERNAL with kvno 3, encryption type des3-cbc-sha1 added to keytab WRFILE:hdfs-unmerged.keytab.
-Entry for principal hdfs/ip-172-17-1-212.ec2.internal@EC2.INTERNAL with kvno 3, encryption type arcfour-hmac added to keytab WRFILE:hdfs-unmerged.keytab.
-Entry for principal hdfs/ip-172-17-1-212.ec2.internal@EC2.INTERNAL with kvno 3, encryption type camellia256-cts-cmac added to keytab WRFILE:hdfs-unmerged.keytab.
-Entry for principal hdfs/ip-172-17-1-212.ec2.internal@EC2.INTERNAL with kvno 3, encryption type camellia128-cts-cmac added to keytab WRFILE:hdfs-unmerged.keytab.
-Entry for principal hdfs/ip-172-17-1-212.ec2.internal@EC2.INTERNAL with kvno 3, encryption type des-hmac-sha1 added to keytab WRFILE:hdfs-unmerged.keytab.
-Entry for principal hdfs/ip-172-17-1-212.ec2.internal@EC2.INTERNAL with kvno 3, encryption type des-cbc-md5 added to keytab WRFILE:hdfs-unmerged.keytab.
+[root@ip-172-17-1-212 kerberos]# kadmin.local -q "xst -k hdfs-unmerged.keytab hdfs/ip-172-17-2-110.ec2.internal@EC2.INTERNAL"
+[root@ip-172-17-1-212 kerberos]# kadmin.local -q "xst -k hdfs-unmerged.keytab hdfs/ip-172-17-2-130.ec2.internal@EC2.INTERNAL"
+[root@ip-172-17-1-212 kerberos]# kadmin.local -q "xst -k hdfs-unmerged.keytab hdfs/ip-172-17-2-96.ec2.internal@EC2.INTERNAL"
+[root@ip-172-17-1-212 kerberos]# klist -kt hdfs-unmerged.keytab  # verify keytab 
+Keytab name: FILE:hdfs-unmerged.keytab
+KVNO Timestamp           Principal
+---- ------------------- ------------------------------------------------------
+   2 06/30/2022 00:51:48 hdfs/ip-172-17-2-110.ec2.internal@EC2.INTERNAL
+   2 06/30/2022 00:51:48 hdfs/ip-172-17-2-110.ec2.internal@EC2.INTERNAL
+   2 06/30/2022 00:51:48 hdfs/ip-172-17-2-110.ec2.internal@EC2.INTERNAL
+   2 06/30/2022 00:51:48 hdfs/ip-172-17-2-110.ec2.internal@EC2.INTERNAL
+   2 06/30/2022 00:51:48 hdfs/ip-172-17-2-110.ec2.internal@EC2.INTERNAL
+   2 06/30/2022 00:51:48 hdfs/ip-172-17-2-110.ec2.internal@EC2.INTERNAL
+   2 06/30/2022 00:51:48 hdfs/ip-172-17-2-110.ec2.internal@EC2.INTERNAL
+   2 06/30/2022 00:51:48 hdfs/ip-172-17-2-110.ec2.internal@EC2.INTERNAL
+   2 06/30/2022 00:52:07 hdfs/ip-172-17-2-130.ec2.internal@EC2.INTERNAL
+   2 06/30/2022 00:52:07 hdfs/ip-172-17-2-130.ec2.internal@EC2.INTERNAL
+   2 06/30/2022 00:52:07 hdfs/ip-172-17-2-130.ec2.internal@EC2.INTERNAL
+   2 06/30/2022 00:52:07 hdfs/ip-172-17-2-130.ec2.internal@EC2.INTERNAL
+   2 06/30/2022 00:52:07 hdfs/ip-172-17-2-130.ec2.internal@EC2.INTERNAL
+   2 06/30/2022 00:52:07 hdfs/ip-172-17-2-130.ec2.internal@EC2.INTERNAL
+   2 06/30/2022 00:52:07 hdfs/ip-172-17-2-130.ec2.internal@EC2.INTERNAL
+   2 06/30/2022 00:52:07 hdfs/ip-172-17-2-130.ec2.internal@EC2.INTERNAL
+   2 06/30/2022 00:52:13 hdfs/ip-172-17-2-96.ec2.internal@EC2.INTERNAL
+   2 06/30/2022 00:52:13 hdfs/ip-172-17-2-96.ec2.internal@EC2.INTERNAL
+   2 06/30/2022 00:52:13 hdfs/ip-172-17-2-96.ec2.internal@EC2.INTERNAL
+   2 06/30/2022 00:52:13 hdfs/ip-172-17-2-96.ec2.internal@EC2.INTERNAL
+   2 06/30/2022 00:52:13 hdfs/ip-172-17-2-96.ec2.internal@EC2.INTERNAL
+   2 06/30/2022 00:52:13 hdfs/ip-172-17-2-96.ec2.internal@EC2.INTERNAL
+   2 06/30/2022 00:52:13 hdfs/ip-172-17-2-96.ec2.internal@EC2.INTERNAL
+   2 06/30/2022 00:52:13 hdfs/ip-172-17-2-96.ec2.internal@EC2.INTERNAL
 
-[root@ip-172-17-1-212 tmp]# kadmin.local -q "xst -k HTTP.keytab HTTP/ip-172-17-1-212.ec2.internal@EC2.INTERNAL"
-Authenticating as principal root/admin@EC2.INTERNAL with password.
-Entry for principal HTTP/ip-172-17-1-212.ec2.internal@EC2.INTERNAL with kvno 3, encryption type aes256-cts-hmac-sha1-96 added to keytab WRFILE:HTTP.keytab.
-Entry for principal HTTP/ip-172-17-1-212.ec2.internal@EC2.INTERNAL with kvno 3, encryption type aes128-cts-hmac-sha1-96 added to keytab WRFILE:HTTP.keytab.
-Entry for principal HTTP/ip-172-17-1-212.ec2.internal@EC2.INTERNAL with kvno 3, encryption type des3-cbc-sha1 added to keytab WRFILE:HTTP.keytab.
-Entry for principal HTTP/ip-172-17-1-212.ec2.internal@EC2.INTERNAL with kvno 3, encryption type arcfour-hmac added to keytab WRFILE:HTTP.keytab.
-Entry for principal HTTP/ip-172-17-1-212.ec2.internal@EC2.INTERNAL with kvno 3, encryption type camellia256-cts-cmac added to keytab WRFILE:HTTP.keytab.
-Entry for principal HTTP/ip-172-17-1-212.ec2.internal@EC2.INTERNAL with kvno 3, encryption type camellia128-cts-cmac added to keytab WRFILE:HTTP.keytab.
-Entry for principal HTTP/ip-172-17-1-212.ec2.internal@EC2.INTERNAL with kvno 3, encryption type des-hmac-sha1 added to keytab WRFILE:HTTP.keytab.
-Entry for principal HTTP/ip-172-17-1-212.ec2.internal@EC2.INTERNAL with kvno 3, encryption type des-cbc-md5 added to keytab WRFILE:HTTP.keytab.
+```
+- execute the following commands to generate HTTP.keytab
+```
+[root@ip-172-17-1-212 kerberos]# kadmin.local -q "xst -k HTTP.keytab HTTP/ip-172-17-2-130.ec2.internal@EC2.INTERNAL"
+[root@ip-172-17-1-212 kerberos]# kadmin.local -q "xst -k HTTP.keytab HTTP/ip-172-17-2-96.ec2.internal@EC2.INTERNAL"
+[root@ip-172-17-1-212 kerberos]# kadmin.local -q "xst -k HTTP.keytab HTTP/ip-172-17-2-110.ec2.internal@EC2.INTERNAL"
+[root@ip-172-17-1-212 kerberos]# klist -kt HTTP.keytab        # verify keytab
+Keytab name: FILE:HTTP.keytab
+KVNO Timestamp           Principal
+---- ------------------- ------------------------------------------------------
+   2 06/30/2022 01:00:02 HTTP/ip-172-17-2-96.ec2.internal@EC2.INTERNAL
+   2 06/30/2022 01:00:02 HTTP/ip-172-17-2-96.ec2.internal@EC2.INTERNAL
+   2 06/30/2022 01:00:02 HTTP/ip-172-17-2-96.ec2.internal@EC2.INTERNAL
+   2 06/30/2022 01:00:02 HTTP/ip-172-17-2-96.ec2.internal@EC2.INTERNAL
+   2 06/30/2022 01:00:02 HTTP/ip-172-17-2-96.ec2.internal@EC2.INTERNAL
+   2 06/30/2022 01:00:02 HTTP/ip-172-17-2-96.ec2.internal@EC2.INTERNAL
+   2 06/30/2022 01:00:02 HTTP/ip-172-17-2-96.ec2.internal@EC2.INTERNAL
+   2 06/30/2022 01:00:02 HTTP/ip-172-17-2-96.ec2.internal@EC2.INTERNAL
+   2 06/30/2022 01:00:08 HTTP/ip-172-17-2-110.ec2.internal@EC2.INTERNAL
+   2 06/30/2022 01:00:08 HTTP/ip-172-17-2-110.ec2.internal@EC2.INTERNAL
+   2 06/30/2022 01:00:08 HTTP/ip-172-17-2-110.ec2.internal@EC2.INTERNAL
+   2 06/30/2022 01:00:08 HTTP/ip-172-17-2-110.ec2.internal@EC2.INTERNAL
+   2 06/30/2022 01:00:08 HTTP/ip-172-17-2-110.ec2.internal@EC2.INTERNAL
+   2 06/30/2022 01:00:08 HTTP/ip-172-17-2-110.ec2.internal@EC2.INTERNAL
+   2 06/30/2022 01:00:08 HTTP/ip-172-17-2-110.ec2.internal@EC2.INTERNAL
+   2 06/30/2022 01:00:08 HTTP/ip-172-17-2-110.ec2.internal@EC2.INTERNAL
+   2 06/30/2022 01:00:14 HTTP/ip-172-17-2-130.ec2.internal@EC2.INTERNAL
+   2 06/30/2022 01:00:14 HTTP/ip-172-17-2-130.ec2.internal@EC2.INTERNAL
+   2 06/30/2022 01:00:14 HTTP/ip-172-17-2-130.ec2.internal@EC2.INTERNAL
+   2 06/30/2022 01:00:14 HTTP/ip-172-17-2-130.ec2.internal@EC2.INTERNAL
+   2 06/30/2022 01:00:14 HTTP/ip-172-17-2-130.ec2.internal@EC2.INTERNAL
+   2 06/30/2022 01:00:14 HTTP/ip-172-17-2-130.ec2.internal@EC2.INTERNAL
+   2 06/30/2022 01:00:14 HTTP/ip-172-17-2-130.ec2.internal@EC2.INTERNAL
+   2 06/30/2022 01:00:14 HTTP/ip-172-17-2-130.ec2.internal@EC2.INTERNAL
 
 ```
-- verify them
-```
-[root@ip-172-17-1-212 tmp]# ls -l hdfs-unmerged.keytab HTTP.keytab 
--rw------- 1 root root 738 Jun 28 14:39 hdfs-unmerged.keytab
--rw------- 1 root root 738 Jun 28 14:40 HTTP.keytab
-```
+
 - merge these keytab files and generate a file `hdfs.keytab`
 ```
-[root@ip-172-17-1-212 tmp]# cd /var/kerberos/krb5kdc/
 [root@ip-172-17-1-212 tmp]# ktutil
 ktutil: rkt hdfs-unmerged.keytab
 ktutil: rkt HTTP.keytab
@@ -67,47 +92,130 @@ ktutil: wkt hdfs.keytab
 - verify `hdfs.keytab`.
 ```
 [root@ip-172-17-1-212 tmp]# klist -kt /var/kerberos/krb5kdc/hdfs.keytab 
-Keytab name: FILE:/var/kerberos/krb5kdc/hdfs.keytab
+Keytab name: FILE:hdfs.keytab
 KVNO Timestamp           Principal
 ---- ------------------- ------------------------------------------------------
-   2 06/26/2022 14:42:16 hdfs/ip-172-17-1-212.ec2.internal@EC2.INTERNAL
-   2 06/26/2022 14:42:16 hdfs/ip-172-17-1-212.ec2.internal@EC2.INTERNAL
-   2 06/26/2022 14:42:16 hdfs/ip-172-17-1-212.ec2.internal@EC2.INTERNAL
-   2 06/26/2022 14:42:16 hdfs/ip-172-17-1-212.ec2.internal@EC2.INTERNAL
-   2 06/26/2022 14:42:16 hdfs/ip-172-17-1-212.ec2.internal@EC2.INTERNAL
-   2 06/26/2022 14:42:16 hdfs/ip-172-17-1-212.ec2.internal@EC2.INTERNAL
-   2 06/26/2022 14:42:16 hdfs/ip-172-17-1-212.ec2.internal@EC2.INTERNAL
-   2 06/26/2022 14:42:16 hdfs/ip-172-17-1-212.ec2.internal@EC2.INTERNAL
-   2 06/26/2022 14:42:16 HTTP/ip-172-17-1-212.ec2.internal@EC2.INTERNAL
-   2 06/26/2022 14:42:16 HTTP/ip-172-17-1-212.ec2.internal@EC2.INTERNAL
-   2 06/26/2022 14:42:16 HTTP/ip-172-17-1-212.ec2.internal@EC2.INTERNAL
-   2 06/26/2022 14:42:16 HTTP/ip-172-17-1-212.ec2.internal@EC2.INTERNAL
-   2 06/26/2022 14:42:16 HTTP/ip-172-17-1-212.ec2.internal@EC2.INTERNAL
-   2 06/26/2022 14:42:16 HTTP/ip-172-17-1-212.ec2.internal@EC2.INTERNAL
-   2 06/26/2022 14:42:16 HTTP/ip-172-17-1-212.ec2.internal@EC2.INTERNAL
-   2 06/26/2022 14:42:16 HTTP/ip-172-17-1-212.ec2.internal@EC2.INTERNAL
+   2 06/30/2022 01:15:54 hdfs/ip-172-17-2-110.ec2.internal@EC2.INTERNAL
+   2 06/30/2022 01:15:54 hdfs/ip-172-17-2-110.ec2.internal@EC2.INTERNAL
+   2 06/30/2022 01:15:54 hdfs/ip-172-17-2-110.ec2.internal@EC2.INTERNAL
+   2 06/30/2022 01:15:54 hdfs/ip-172-17-2-110.ec2.internal@EC2.INTERNAL
+   2 06/30/2022 01:15:54 hdfs/ip-172-17-2-110.ec2.internal@EC2.INTERNAL
+   2 06/30/2022 01:15:54 hdfs/ip-172-17-2-110.ec2.internal@EC2.INTERNAL
+   2 06/30/2022 01:15:54 hdfs/ip-172-17-2-110.ec2.internal@EC2.INTERNAL
+   2 06/30/2022 01:15:54 hdfs/ip-172-17-2-110.ec2.internal@EC2.INTERNAL
+   2 06/30/2022 01:15:54 hdfs/ip-172-17-2-130.ec2.internal@EC2.INTERNAL
+   2 06/30/2022 01:15:54 hdfs/ip-172-17-2-130.ec2.internal@EC2.INTERNAL
+   2 06/30/2022 01:15:54 hdfs/ip-172-17-2-130.ec2.internal@EC2.INTERNAL
+   2 06/30/2022 01:15:54 hdfs/ip-172-17-2-130.ec2.internal@EC2.INTERNAL
+   2 06/30/2022 01:15:54 hdfs/ip-172-17-2-130.ec2.internal@EC2.INTERNAL
+   2 06/30/2022 01:15:54 hdfs/ip-172-17-2-130.ec2.internal@EC2.INTERNAL
+   2 06/30/2022 01:15:54 hdfs/ip-172-17-2-130.ec2.internal@EC2.INTERNAL
+   2 06/30/2022 01:15:54 hdfs/ip-172-17-2-130.ec2.internal@EC2.INTERNAL
+   2 06/30/2022 01:15:54 hdfs/ip-172-17-2-96.ec2.internal@EC2.INTERNAL
+   2 06/30/2022 01:15:54 hdfs/ip-172-17-2-96.ec2.internal@EC2.INTERNAL
+   2 06/30/2022 01:15:54 hdfs/ip-172-17-2-96.ec2.internal@EC2.INTERNAL
+   2 06/30/2022 01:15:54 hdfs/ip-172-17-2-96.ec2.internal@EC2.INTERNAL
+   2 06/30/2022 01:15:54 hdfs/ip-172-17-2-96.ec2.internal@EC2.INTERNAL
+   2 06/30/2022 01:15:54 hdfs/ip-172-17-2-96.ec2.internal@EC2.INTERNAL
+   2 06/30/2022 01:15:54 hdfs/ip-172-17-2-96.ec2.internal@EC2.INTERNAL
+   2 06/30/2022 01:15:54 hdfs/ip-172-17-2-96.ec2.internal@EC2.INTERNAL
+   2 06/30/2022 01:15:54 HTTP/ip-172-17-2-96.ec2.internal@EC2.INTERNAL
+   2 06/30/2022 01:15:54 HTTP/ip-172-17-2-96.ec2.internal@EC2.INTERNAL
+   2 06/30/2022 01:15:54 HTTP/ip-172-17-2-96.ec2.internal@EC2.INTERNAL
+   2 06/30/2022 01:15:54 HTTP/ip-172-17-2-96.ec2.internal@EC2.INTERNAL
+   2 06/30/2022 01:15:54 HTTP/ip-172-17-2-96.ec2.internal@EC2.INTERNAL
+   2 06/30/2022 01:15:55 HTTP/ip-172-17-2-96.ec2.internal@EC2.INTERNAL
+   2 06/30/2022 01:15:55 HTTP/ip-172-17-2-96.ec2.internal@EC2.INTERNAL
+   2 06/30/2022 01:15:55 HTTP/ip-172-17-2-96.ec2.internal@EC2.INTERNAL
+   2 06/30/2022 01:15:55 HTTP/ip-172-17-2-110.ec2.internal@EC2.INTERNAL
+   2 06/30/2022 01:15:55 HTTP/ip-172-17-2-110.ec2.internal@EC2.INTERNAL
+   2 06/30/2022 01:15:55 HTTP/ip-172-17-2-110.ec2.internal@EC2.INTERNAL
+   2 06/30/2022 01:15:55 HTTP/ip-172-17-2-110.ec2.internal@EC2.INTERNAL
+   2 06/30/2022 01:15:55 HTTP/ip-172-17-2-110.ec2.internal@EC2.INTERNAL
+   2 06/30/2022 01:15:55 HTTP/ip-172-17-2-110.ec2.internal@EC2.INTERNAL
+   2 06/30/2022 01:15:55 HTTP/ip-172-17-2-110.ec2.internal@EC2.INTERNAL
+   2 06/30/2022 01:15:55 HTTP/ip-172-17-2-110.ec2.internal@EC2.INTERNAL
+   2 06/30/2022 01:15:55 HTTP/ip-172-17-2-130.ec2.internal@EC2.INTERNAL
+   2 06/30/2022 01:15:55 HTTP/ip-172-17-2-130.ec2.internal@EC2.INTERNAL
+   2 06/30/2022 01:15:55 HTTP/ip-172-17-2-130.ec2.internal@EC2.INTERNAL
+   2 06/30/2022 01:15:55 HTTP/ip-172-17-2-130.ec2.internal@EC2.INTERNAL
+   2 06/30/2022 01:15:55 HTTP/ip-172-17-2-130.ec2.internal@EC2.INTERNAL
+   2 06/30/2022 01:15:55 HTTP/ip-172-17-2-130.ec2.internal@EC2.INTERNAL
+   2 06/30/2022 01:15:55 HTTP/ip-172-17-2-130.ec2.internal@EC2.INTERNAL
+   2 06/30/2022 01:15:55 HTTP/ip-172-17-2-130.ec2.internal@EC2.INTERNAL
 
 ```
-- put `hdfs.keytab` in `/opt/kerberos-hadoop/keytabs/hdfs.keytab`
+- verify again
 ```
-[root@ip-172-17-1-212 tmp]# cp /var/kerberos/krb5kdc/hdfs.keytab /opt/kerberos-hadoop/keytabs/hdfs.keytab
-[root@ip-172-17-1-212 tmp]# chown hdfs:hadoop  /opt/kerberos-hadoop/keytabs/hdfs.keytab
+[root@ip-172-17-1-212 kerberos]# kinit  -k -t  hdfs.keytab hdfs/ip-172-17-2-110.ec2.internal@EC2.INTERNAL
+[root@ip-172-17-1-212 kerberos]# klist
+Ticket cache: FILE:/tmp/root_krb5cc
+Default principal: hdfs/ip-172-17-2-110.ec2.internal@EC2.INTERNAL
+
+Valid starting       Expires              Service principal
+06/30/2022 01:48:58  07/01/2022 01:48:58  krbtgt/EC2.INTERNAL@EC2.INTERNAL
+	renew until 07/07/2022 01:48:58
+
+[root@ip-172-17-1-212 kerberos]# kinit  -k -t  hdfs.keytab HTTP/ip-172-17-2-110.ec2.internal@EC2.INTERNAL
+[root@ip-172-17-1-212 kerberos]# klist
+Ticket cache: FILE:/tmp/root_krb5cc
+Default principal: HTTP/ip-172-17-2-110.ec2.internal@EC2.INTERNAL
+
+Valid starting       Expires              Service principal
+06/30/2022 01:49:16  07/01/2022 01:49:16  krbtgt/EC2.INTERNAL@EC2.INTERNAL
+	renew until 07/07/2022 01:49:16
+
+```
+## Hadoop package deployment
+- On each host (`172.17.2.110`, `172.17.2.130`, `172.17.2.96`), we need to download hadoop package.
+- Please execute the following commands with `root` on `172.17.2.110`, `172.17.2.130`, `172.17.2.96`. (I assume the latest hadoop version is 3.3.3)
+```
+# HADOOP_VERSION=3.3.3
+# cd /tmp
+# wget https://dlcdn.apache.org/hadoop/common/hadoop-$HADOOP_VERSION/hadoop-$HADOOP_VERSION.tar.gz
+# tar xzf hadoop-$HADOOP_VERSION.tar.gz
+# mkdir /opt/kerberos-hadoop/
+# mv hadoop-$HADOOP_VERSION /opt/kerberos-hadoop/
+# chown hadoop:hadoop -R  /opt/kerberos-hadoop/hadoop-$HADOOP_VERSION
+# ln -s /opt/kerberos-hadoop/hadoop-$HADOOP_VERSION /opt/kerberos-hadoop/latest
+# mkdir -p /opt/kerberos-hadoop/keytabs/
+# chown hadoop:hadoop /opt/kerberos-hadoop/keytabs/
+# chmod g+w  /opt/kerberos-hadoop/keytabs/
+# mkdir -p /var/run/hadoop
+# chown hadoop:hadoop /var/run/hadoop
+# chmod g+w /var/run/hadoop
+# chmod 1777 /var/run/hadoop
+# mkdir -p /opt/kerberos-hadoop/jsvc
+# chown hadoop:hadoop /opt/kerberos-hadoop/jsvc
+# mkdir -p /opt/kerberos-hadoop/data/
+# chown hdfs:hadoop  /opt/kerberos-hadoop/data/
 ```
 
-## modify hadoop config files
-- /opt/kerberos-hadoop/latest/etc/hadoop/core-site.xml
+## keytab configuration (Cont'd)
+- deploy `hdfs.keytab` from KDC host(`172.17.1.212`) to `/opt/kerberos-hadoop/keytabs/hdfs.keytab` of `172.17.2.110`, `172.17.2.130`, `172.17.2.96`.
 ```
-[root@ip-172-17-1-212 hadoop]# vim /opt/kerberos-hadoop/latest/etc/hadoop/core-site.xml 
+[root@ip-172-17-1-212 tmp]# scp hdfs.keytab root@172.17.2.110:/opt/kerberos-hadoop/keytabs/hdfs.keytab
+[root@ip-172-17-1-212 tmp]# scp hdfs.keytab root@172.17.2.130:/opt/kerberos-hadoop/keytabs/hdfs.keytab
+[root@ip-172-17-1-212 tmp]# scp hdfs.keytab root@172.17.2.96:/opt/kerberos-hadoop/keytabs/hdfs.keytab
+[root@ip-172-17-1-212 tmp]# ssh root@172.17.2.110 "chown hdfs:hadoop  /opt/kerberos-hadoop/keytabs/hdfs.keytab"
+[root@ip-172-17-1-212 tmp]# ssh root@172.17.2.130 "chown hdfs:hadoop  /opt/kerberos-hadoop/keytabs/hdfs.keytab"
+[root@ip-172-17-1-212 tmp]# ssh root@172.17.2.96 "chown hdfs:hadoop  /opt/kerberos-hadoop/keytabs/hdfs.keytab"
+```
+
+## modify hadoop config files on `172.17.2.110`, `172.17.2.130`, `172.17.2.96`
+- /opt/kerberos-hadoop/latest/etc/hadoop/core-site.xml on `172.17.2.110`, `172.17.2.130`, `172.17.2.96` will look like
+```
+[root@ip-172-17-2-110 hadoop]# vim /opt/kerberos-hadoop/latest/etc/hadoop/core-site.xml 
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
 
 <configuration>
     <property>
         <name>fs.defaultFS</name>
-        <value>hdfs://ip-172-17-1-212.ec2.internal:9000</value>
-</property>
+        <value>hdfs://ip-172-17-2-110.ec2.internal:9000</value>
+    </property>
 
-<!-- kerberos -->
+    <!-- kerberos -->
     <property>
         <name>hadoop.security.authentication</name>
         <value>kerberos</value>
@@ -120,23 +228,17 @@ KVNO Timestamp           Principal
 </configuration>
 
 ``` 
--  /opt/kerberos-hadoop/latest/etc/hadoop/hadoop-env.sh
+-  /opt/kerberos-hadoop/latest/etc/hadoop/hadoop-env.sh  on `172.17.2.110`, `172.17.2.130`, `172.17.2.96` will look like
 ```
-export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk
+export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk/
 export HADOOP_OS_TYPE=${HADOOP_OS_TYPE:-$(uname -s)}
 export JSVC_HOME=/opt/kerberos-hadoop/jsvc
 export HDFS_DATANODE_SECURE_USER=hdfs
 export HADOOP_SECURE_PID_DIR=/var/run/hadoop
 export HADOOP_SECURE_LOG_DIR=/var/run/hadoop
 ```
-- create a folder /var/run/hadoop
+- /opt/kerberos-hadoop/latest/etc/hadoop/hdfs-site.xml on `172.17.2.110`, `172.17.2.130`, `172.17.2.96` will look like
 ```
-[root@ip-172-17-1-212 hadoop]# mkdir -p /var/run/hadoop
-[root@ip-172-17-1-212 hadoop]# chmod 1777 /var/run/hadoop
-```
-- /opt/kerberos-hadoop/latest/etc/hadoop/hdfs-site.xml
-```
-[root@ip-172-17-1-212 hadoop]# vim /opt/kerberos-hadoop/latest/etc/hadoop/hdfs-site.xml 
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
 <!--
@@ -260,25 +362,27 @@ export HADOOP_SECURE_LOG_DIR=/var/run/hadoop
 </configuration>
 
 ```
-## JSVC
-- Download from [Apache Commons](https://commons.apache.org/proper/commons-daemon/download_daemon.cgi)
+- /opt/hadoop/latest/etc/hadoop/workers on `172.17.2.110`, `172.17.2.130`, `172.17.2.96`.
 ```
-[root@ip-172-17-1-212 tmp]# wget https://dlcdn.apache.org//commons/daemon/source/commons-daemon-1.3.1-src.zip
+[ec2-user@ip-172-17-1-212 hadoop-prep]$ cat workers 
+ip-172-17-2-96.ec2.internal
 ```
-- unzip
+-/opt/hadoop/latest/etc/hadoop/masters on `172.17.2.110`, `172.17.2.130`, `172.17.2.96`.
 ```
-[root@ip-172-17-1-212 tmp]# unzip commons-daemon-1.3.1-src.zip 
+ ip-172-17-2-130.ec2.internal
+```
 
+## Install JSVC on `172.17.2.110`, `172.17.2.130`, `172.17.2.96`.
+- On `172.17.2.110`, `172.17.2.130`, `172.17.2.96` , execute the following commands. They will 1) download jsvc 2) configure&make 3) copy jsvc to  /opt/kerberos-hadoop/jsvc/
 ```
-- configure
-```
-[root@ip-172-17-1-212 tmp]# cd commons-daemon-1.3.1-src/src/native/unix/
-[root@ip-172-17-1-212 unix]# ./configure && make
-```
-- We will get a file `jsvc`. Copy this file to $JSVC_HOME(/opt/kerberos-hadoop/jsvc)
-```
-[root@ip-172-17-1-212 tmp]# mkdir /opt/kerberos-hadoop/jsvc
-[root@ip-172-17-1-212 unix]# cp jsvc   /opt/kerberos-hadoop/jsvc
+cd /tmp/
+wget https://dlcdn.apache.org//commons/daemon/source/commons-daemon-1.3.1-src.zip
+unzip commons-daemon-1.3.1-src.zip
+export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk/
+cd commons-daemon-1.3.1-src/src/native/unix/
+./configure   && make
+cp jsvc   /opt/kerberos-hadoop/jsvc/
+chown hadoop:hadoop  /opt/kerberos-hadoop/jsvc/
 ```
 ## start hdfs service
 - modify file `/opt/kerberos-hadoop/hadoop-3.3.3/sbin/start-dfs.sh` and comment out the following part
@@ -303,7 +407,7 @@ hdfs
 ```
 - Please allow `root` to login with ssh and set up root's ssh key
 
-- use accpount `root` to start secure datanode
+- use account `root` to start secure datanode
 ```
 [root@ip-172-17-1-212 unix]# cd /opt/kerberos-hadoop/hadoop-3.3.3/sbin/
 [root@ip-172-17-1-212 sbin]# ./start-secure-dns.sh
