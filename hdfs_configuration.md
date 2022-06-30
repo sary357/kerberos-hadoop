@@ -367,9 +367,10 @@ export HADOOP_SECURE_LOG_DIR=/var/run/hadoop
 [ec2-user@ip-172-17-1-212 hadoop-prep]$ cat workers 
 ip-172-17-2-96.ec2.internal
 ```
--/opt/hadoop/latest/etc/hadoop/masters on `172.17.2.110`, `172.17.2.130`, `172.17.2.96`.
+- /opt/hadoop/latest/etc/hadoop/masters on `172.17.2.110`, `172.17.2.130`, `172.17.2.96`.
 ```
- ip-172-17-2-130.ec2.internal
+[ec2-user@ip-172-17-1-212 hadoop-prep]$ cat masters 
+ip-172-17-2-130.ec2.internal
 ```
 
 ## Install JSVC on `172.17.2.110`, `172.17.2.130`, `172.17.2.96`.
@@ -384,6 +385,8 @@ cd commons-daemon-1.3.1-src/src/native/unix/
 cp jsvc   /opt/kerberos-hadoop/jsvc/
 chown hadoop:hadoop  /opt/kerberos-hadoop/jsvc/
 ```
+
+
 ## start hdfs service
 - modify file `/opt/kerberos-hadoop/hadoop-3.3.3/sbin/start-dfs.sh` and comment out the following part
 ```
