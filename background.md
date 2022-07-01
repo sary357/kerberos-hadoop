@@ -11,7 +11,7 @@ SELINUXTYPE=targeted
 - host list
 ```
 172.17.1.212	ip-172-17-1-212.ec2.internal time server + KDC
-172.17.2.110    ip-172-17-2-110.ec2.internal namenode
+172.17.2.110    ip-172-17-2-110.ec2.internal namenode + hadoop client
 172.17.2.130    ip-172-17-2-130.ec2.internal secondary namenode
 172.17.2.96     ip-172-17-2-96.ec2.internal  datanode
 ```
