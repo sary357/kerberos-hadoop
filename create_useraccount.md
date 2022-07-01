@@ -10,20 +10,23 @@ root
 [root@ip-172-17-2-110 ~]# passwd ec2-user
 ```
 ## Generate a principal for the account `ec2-user` on KDC (172.17.1.212)
-- execute the following to generate principal for `ec2-user` for every host(). As long as you remember `kadmin` password, you can use any account to execute the following commands.
+- execute the following to generate principal for `ec2-user` for every host(172.17.2.110, 172.17.2.130, 172.17.2.96).
 ```
 [root@ip-172-17-1-212 ~]# kadmin.local 
 Authenticating as principal root/admin@EC2.INTERNAL with password.
+
 kadmin.local:  addprinc ec2-user/ip-172-17-2-110.ec2.internal@EC2.INTERNAL
 WARNING: no policy specified for ec2-user/ip-172-17-2-110.ec2.internal@EC2.INTERNAL; defaulting to no policy
 Enter password for principal "ec2-user/ip-172-17-2-110.ec2.internal@EC2.INTERNAL": 
 Re-enter password for principal "ec2-user/ip-172-17-2-110.ec2.internal@EC2.INTERNAL": 
 Principal "ec2-user/ip-172-17-2-110.ec2.internal@EC2.INTERNAL" created.
+
 kadmin.local:  addprinc ec2-user/ip-172-17-2-130.ec2.internal@EC2.INTERNAL
 WARNING: no policy specified for ec2-user/ip-172-17-2-130.ec2.internal@EC2.INTERNAL; defaulting to no policy
 Enter password for principal "ec2-user/ip-172-17-2-130.ec2.internal@EC2.INTERNAL": 
 Re-enter password for principal "ec2-user/ip-172-17-2-130.ec2.internal@EC2.INTERNAL": 
 Principal "ec2-user/ip-172-17-2-130.ec2.internal@EC2.INTERNAL" created.
+
 kadmin.local:  addprinc ec2-user/ip-172-17-2-96.ec2.internal@EC2.INTERNAL
 WARNING: no policy specified for ec2-user/ip-172-17-2-96.ec2.internal@EC2.INTERNAL; defaulting to no policy
 Enter password for principal "ec2-user/ip-172-17-2-96.ec2.internal@EC2.INTERNAL": 
@@ -39,7 +42,7 @@ HTTP/ip-172-17-2-96.ec2.internal@EC2.INTERNAL
 K/M@EC2.INTERNAL
 ec2-user/ip-172-17-2-110.ec2.internal@EC2.INTERNAL ---> as long as we can see this line and the following 2 lines
 ec2-user/ip-172-17-2-130.ec2.internal@EC2.INTERNAL ---> that means we are done.
-ec2-user/ip-172-17-2-96.ec2.internal@EC2.INTERNAL
+ec2-user/ip-172-17-2-96.ec2.internal@EC2.INTERNAL  --->
 hdfs/ip-172-17-2-110.ec2.internal@EC2.INTERNAL
 hdfs/ip-172-17-2-130.ec2.internal@EC2.INTERNAL
 hdfs/ip-172-17-2-96.ec2.internal@EC2.INTERNAL
@@ -85,7 +88,7 @@ Found 2 items
 drwxr-xr-x   - ec2-user ec2-user            0 2022-06-27 14:33 /user/ec2-user
 ```
 
-## try to upload a file
+## try to upload a file with the account `ec2-user`
 - login as `ec2-user`
 ```
 [ec2-user@ip-172-17-2-110 ~]$ whoami
@@ -261,7 +264,7 @@ Valid starting       Expires              Service principal
 	renew until 2022-07-08T14:44:04
 
 ```
-- try to check files in the folder
+- try to check files in HDFS folder
 ```
 [ec2-user@ip-172-17-2-110 ~]$ hdfs dfs -ls /user/ec2-user
 Found 1 items
