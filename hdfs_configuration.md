@@ -388,7 +388,7 @@ chown hadoop:hadoop  /opt/kerberos-hadoop/jsvc/
 
 
 ## start hdfs service
-- modify file `/opt/kerberos-hadoop/hadoop-3.3.3/sbin/start-dfs.sh` and comment out the following part
+- modify file `/opt/kerberos-hadoop/hadoop-3.3.3/sbin/start-dfs.sh` and comment out the following part on all hosts (172.17.2.110, 172.17.2.130, and 172.17.2.96)
 ```
 # echo "Starting datanodes: use start-secure.sh with root"
 # hadoop_uservar_su hdfs datanode "${HADOOP_HDFS_HOME}/bin/hdfs" \
@@ -399,7 +399,7 @@ chown hadoop:hadoop  /opt/kerberos-hadoop/jsvc/
 # (( HADOOP_JUMBO_RETCOUNTER=HADOOP_JUMBO_RETCOUNTER + $? ))
 
 ```
-- use account `hdfs` to start namenode and secondary namenode
+- use account `hdfs` to start namenode and secondary namenode on 172.17.2.110
 ```
 [hdfs@ip-172-17-1-212 ~]$ whoami
 hdfs
