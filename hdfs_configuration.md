@@ -363,7 +363,10 @@ export HADOOP_SECURE_LOG_DIR=/var/run/hadoop
     <name>dfs.web.authentication.kerberos.principal</name>
     <value>HTTP/_HOST@EC2.INTERNAL</value>
 </property>
-
+<property>
+    <name>dfs.namenode.secondary.http-address</name>
+    <value>ip-172-17-2-130.ec2.internal:50090</value>
+</property>
 </configuration>
 
 ```
