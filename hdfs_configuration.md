@@ -189,6 +189,10 @@ Valid starting       Expires              Service principal
 # chown hadoop:hadoop /opt/kerberos-hadoop/jsvc
 # mkdir -p /opt/kerberos-hadoop/data/
 # chown hdfs:hadoop  /opt/kerberos-hadoop/data/
+#  mkdir -p /opt/kerberos-hadoop/hadoop-3.3.3/logs
+# chown hadoop:hadoop /opt/kerberos-hadoop/hadoop-3.3.3/logs
+# chmod 1777 /opt/kerberos-hadoop/hadoop-3.3.3/logs
+
 ```
 
 ## keytab configuration (Cont'd)
@@ -234,6 +238,7 @@ export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk/
 export HADOOP_OS_TYPE=${HADOOP_OS_TYPE:-$(uname -s)}
 export JSVC_HOME=/opt/kerberos-hadoop/jsvc
 export HDFS_DATANODE_SECURE_USER=hdfs
+export HADOOP_PID_DIR=/var/run/hadoop
 export HADOOP_SECURE_PID_DIR=/var/run/hadoop
 export HADOOP_SECURE_LOG_DIR=/var/run/hadoop
 ```
@@ -388,7 +393,7 @@ chown hadoop:hadoop  /opt/kerberos-hadoop/jsvc/
 
 
 ## start hdfs service
-- modify file `/opt/kerberos-hadoop/hadoop-3.3.3/sbin/start-dfs.sh` and comment out the following part on all hosts (172.17.2.110, 172.17.2.130, and 172.17.2.96)
+- modify file `/opt/kerberos-hadoop/hadoop-3.3.3/sbin/start-dfs.sh` and `/opt/kerberos-hadoop/hadoop-3.3.3/sbin/stop-dfs.sh`. we need to comment out the following part on all hosts (172.17.2.110, 172.17.2.130, and 172.17.2.96)
 ```
 # echo "Starting datanodes: use start-secure.sh with root"
 # hadoop_uservar_su hdfs datanode "${HADOOP_HDFS_HOME}/bin/hdfs" \
@@ -399,21 +404,68 @@ chown hadoop:hadoop  /opt/kerberos-hadoop/jsvc/
 # (( HADOOP_JUMBO_RETCOUNTER=HADOOP_JUMBO_RETCOUNTER + $? ))
 
 ```
+- prapare some env variables in /home/hdfs/.bash_profile on (172.17.2.110)
+```
+[hdfs@ip-172-17-2-110 ~]$ cat ~/.bash_profile 
+# .bash_profile
+
+# Get the aliases and functions
+if [ -f ~/.bashrc ]; then
+	. ~/.bashrc
+fi
+
+# User specific environment and startup programs
+alias python=python3.7
+export PYSPARK_PYTHON=python3.7
+export PYSPARK_DRIVER_PYTHON=python3.7
+export KRB5CCNAME=/tmp/$USER\_krb5cc
+PATH=$PATH:$HOME/.local/bin:$HOME/bin:/opt/kerberos-hadoop/latest/bin/:/opt/kerberos-hadoop/latst/sbin/
+
+export PATH
+
+```
 - use account `hdfs` to start namenode and secondary namenode on 172.17.2.110
 ```
-[hdfs@ip-172-17-1-212 ~]$ whoami
+[hdfs@ip-172-17-2-110 ~]$ whoami
 hdfs
 
-[hdfs@ip-172-17-1-212 ~]$ kinit -k -t /opt/kerberos-hadoop/keytabs/hdfs.keytab hdfs/`hostname`@EC2.INTERNAL
-[hdfs@ip-172-17-1-212 ~]$ cd  /opt/kerberos-hadoop/hadoop-3.3.3/sbin/
-[hdfs@ip-172-17-1-212 ~]$ ./start-dfs.sh
+[hdfs@ip-172-17-2-110 ~]$ kinit -k -t /opt/kerberos-hadoop/keytabs/hdfs.keytab hdfs/`hostname`@EC2.INTERNAL
+[hdfs@ip-172-17-2-110 ~]$ cd  /opt/kerberos-hadoop/hadoop-3.3.3/sbin/
+[hdfs@ip-172-17-2-110 ~]$  /opt/kerberos-hadoop/hadoop-3.3.3/bin/namenode -format
+```
+- execute `start-dfs.sh`
+```
+[hdfs@ip-172-17-2-110 ~]$ ./start-dfs.sh
 ```
 - Please allow `root` to login with ssh and set up root's ssh key
 
-- use account `root` to start secure datanode
+- use account `root` to start secure datanode on 172.17.2.110
 ```
-[root@ip-172-17-1-212 unix]# cd /opt/kerberos-hadoop/hadoop-3.3.3/sbin/
-[root@ip-172-17-1-212 sbin]# ./start-secure-dns.sh
+[root@ip-172-17-2-110 unix]# cd /opt/kerberos-hadoop/hadoop-3.3.3/sbin/
+[root@ip-172-17-2-110 sbin]# ./start-secure-dns.sh
+```
+- Verify with account `hdfs` on 172.17.2.110
+```
+# kinit
+[hdfs@ip-172-17-2-110 ~]$ kinit -k -t /opt/kerberos-hadoop/keytabs/hdfs.keytab hdfs/`hostname`@EC2.INTERNAL
+
+# make sure we have a valid token
+[hdfs@ip-172-17-2-110 ~]$ klist
+Ticket cache: FILE:/tmp/hdfs_krb5cc
+Default principal: hdfs/ip-172-17-2-110.ec2.internal@EC2.INTERNAL
+
+Valid starting       Expires              Service principal
+07/01/2022 03:03:35  07/02/2022 03:03:35  krbtgt/EC2.INTERNAL@EC2.INTERNAL
+	renew until 07/08/2022 03:03:35
+
+# check folder in "/" and do something
+[hdfs@ip-172-17-2-110 ~]$ hdfs dfs -ls /
+[hdfs@ip-172-17-2-110 ~]$ hdfs dfs -mkdir /user/
+[hdfs@ip-172-17-2-110 ~]$ hdfs dfs -mkdir /user/ec2-user
+[hdfs@ip-172-17-2-110 ~]$ hdfs dfs -ls /
+Found 1 items
+drwxr-xr-x   - hdfs supergroup          0 2022-07-01 03:06 /user
+
 ```
 
 # References
