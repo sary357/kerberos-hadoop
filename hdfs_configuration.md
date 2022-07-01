@@ -440,7 +440,6 @@ hdfs
 ```
 [hdfs@ip-172-17-2-110 ~]$ ./start-dfs.sh
 ```
-- Please allow `root` to login with ssh and set up root's ssh key
 
 - use account `root` to start secure datanode on 172.17.2.110
 ```
