@@ -11,9 +11,9 @@ SELINUXTYPE=targeted
 - host list
 ```
 172.17.1.212	ip-172-17-1-212.ec2.internal time server + KDC
-172.17.2.110    ip-172-17-2-110.ec2.internal namenode + hadoop client
-172.17.2.130    ip-172-17-2-130.ec2.internal secondary namenode
-172.17.2.96     ip-172-17-2-96.ec2.internal  datanode
+172.17.2.110    ip-172-17-2-110.ec2.internal namenode + hadoop client + resource manager
+172.17.2.130    ip-172-17-2-130.ec2.internal secondary namenode 
+172.17.2.96     ip-172-17-2-96.ec2.internal  datanode + node manager
 ```
 - on each host (172.17.2.110, 172.17.2.130, 172.17.2.96), we install `python3-3.7.10-1.amzn2.0.1.x86_64` + `java-1.8.0-openjdk-1.8.0.312.b07-1.amzn2.0.2.x86_64` + `java-1.8.0-openjdk-devel-1.8.0.312.b07-1.amzn2.0.2.x86_64`
 ```
