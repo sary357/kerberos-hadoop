@@ -311,7 +311,7 @@ KVNO Timestamp           Principal
 </configuration>
 
 ```
-- yarn-site.xml on 172.17.2.110, 172.17.2.130, 172.17.2.96
+-  /opt/hadoop/latest/etc/hadoop/yarn-site.xml on 172.17.2.110, 172.17.2.130, 172.17.2.96
 ```
 <?xml version="1.0"?>
 <!--
@@ -489,3 +489,5 @@ Starting Job
 2022-07-02 16:07:52,151 INFO hdfs.DFSClient: Created token for ec2-user: HDFS_DELEGATION_TOKEN owner=ec2-user/ip-172-17-2-110.ec2.internal@EC2.INTERNAL, renewer=yarn, realUser=, issueDate=1656778072146, maxDate=1657382872146, sequenceNumber=3, masterKeyId=7 on 172.17.2.110:9000
 2022-07-02 16:07:52,208 INFO security.TokenCache: Got dt for hdfs://ip-172-17-2-110.ec2.internal:9000; Kind: HDFS_DELEGATION_TOKEN, Service: 172.17.2.110:900
 ```
+
+## Congratulation!! You're done
