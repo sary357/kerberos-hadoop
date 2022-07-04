@@ -241,6 +241,8 @@ export HDFS_DATANODE_SECURE_USER=hdfs
 export HADOOP_PID_DIR=/var/run/hadoop
 export HADOOP_SECURE_PID_DIR=/var/run/hadoop
 export HADOOP_SECURE_LOG_DIR=/var/run/hadoop
+export YARN_RESOURCEMANAGER_USER=yarn # for YARN
+export YARN_NODEMANAGER_USER=yarn     # for YARN
 ```
 - /opt/kerberos-hadoop/latest/etc/hadoop/hdfs-site.xml on `172.17.2.110`, `172.17.2.130`, `172.17.2.96` will look like
 ```
